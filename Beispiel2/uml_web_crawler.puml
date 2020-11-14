@@ -1,0 +1,22 @@
+@startuml
+class java.net.URL
+class java.util.ArrayList
+class java.util.Collection
+class java.util.Collections
+class java.util.HashSet
+class java.util.List
+class java.util.concurrent.ExecutorService
+class java.util.concurrent.Executors
+class java.util.concurrent.ForkJoinPool
+class java.util.concurrent.RecursiveAction
+class net.eaustria.webcrawler.LinkFinder
+class net.eaustria.webcrawler.LinkFinderAction
+class net.eaustria.webcrawler.WebCrawler6
+class net.eaustria.webcrawler.WebCrawler7
+class org.htmlparser.Parser
+class org.htmlparser.filters.NodeClassFilter
+class org.htmlparser.tags.LinkTag
+class org.htmlparser.util.NodeList
+interface java.lang.Runnable
+interface net.eaustria.webcrawler.ILinkHandler
+@enduml
