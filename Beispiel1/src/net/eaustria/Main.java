@@ -31,6 +31,7 @@ public class Main {
         }
 
         System.out.println(ReciprocalArraySum.parManyTaskArraySum(input, 100));
+        System.out.println(ReciprocalArraySum.seqArraySum(input));
 
     }
 

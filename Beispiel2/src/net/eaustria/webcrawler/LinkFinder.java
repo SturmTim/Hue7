@@ -5,18 +5,15 @@
  */
 package net.eaustria.webcrawler;
 
+import java.io.IOException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 /**
  *
  * @author bmayr
  */
-import java.net.URL;
-import org.htmlparser.Parser;
-import org.htmlparser.filters.NodeClassFilter;
-import org.htmlparser.tags.LinkTag;
-import org.htmlparser.util.NodeList;
-import java.util.ArrayList;
-import java.util.List;
-
 public class LinkFinder implements Runnable {
 
     private String url;
@@ -26,8 +23,12 @@ public class LinkFinder implements Runnable {
      */
     private static final long t0 = System.nanoTime();
 
+    private static boolean reached1500 = false;
+    private static boolean reached3000 = false;
+
     public LinkFinder(String url, ILinkHandler handler) {
-        //ToDo: Implement Constructor
+        this.url = url;
+        this.linkHandler = handler;
     }
 
     @Override
@@ -41,8 +42,37 @@ public class LinkFinder implements Runnable {
         // 2. get url and Parse Website
         // 3. extract all URLs and add url to list of urls which should be visited
         //    only if link is not empty and url has not been visited before
-        // 4. If size of link handler equals 500 -> print time elapsed for statistics               
-        
+        // 4. If size of link handler equals 500 -> print time elapsed for statistics
+        if (linkHandler.size() > 1500 && !reached1500) {
+            reached1500 = true;
+            System.out.println(((System.nanoTime() - t0) / 1000000000) + " s");
+        }
+
+        if (linkHandler.size() > 3000 && !reached3000) {
+            reached3000 = true;
+            System.out.println(((System.nanoTime() - t0) / 1000000000) + " s");
+        }
+
+        if (!linkHandler.visited(url)) {
+            try {
+                Document doc = Jsoup.connect(url).get();
+                Elements links = doc.select("a[href]");
+                linkHandler.addVisited(url);
+
+                links.stream()
+                        .forEach(link -> {
+                            try {
+                                if (link.attr("href").startsWith("http")) {
+                                    linkHandler.queueLink(link.attr("href"));
+                                }
+                            } catch (Exception e) {
+                                System.out.println("Exception");
+                            }
+                        });
+
+            } catch (IOException e) {
+                System.out.println("IOException");
+            }
+        }
     }
 }
-

@@ -64,9 +64,13 @@ public final class ReciprocalArraySum {
         @Override
         protected void compute() {
             if (endIndexExclusive - startIndexInclusive < SEQUENTIAL_THRESHOLD) {
-                value = seqArraySum(input);
+
+                for (int index = startIndexInclusive; index < endIndexExclusive; index++) {
+                    value += 1 / input[index];
+                }
             } else {
                 int middle = startIndexInclusive + ((endIndexExclusive - startIndexInclusive) / 2);
+
                 ReciprocalArraySumTask sumActionFirstHalf = new ReciprocalArraySumTask(startIndexInclusive, middle, input);
                 ReciprocalArraySumTask sumActionScondHalf = new ReciprocalArraySumTask(middle, endIndexExclusive, input);
                 invokeAll(sumActionFirstHalf, sumActionScondHalf);

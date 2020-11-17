@@ -5,22 +5,20 @@
  */
 package net.eaustria.webcrawler;
 
-import java.net.URL;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.RecursiveAction;
-import org.htmlparser.Parser;
-import org.htmlparser.filters.NodeClassFilter;
-import org.htmlparser.tags.LinkTag;
-import org.htmlparser.util.NodeList;
+import java.util.stream.Collectors;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 /**
  *
  * @author bmayr
  */
-
 // Recursive Action for forkJoinFramework from Java7
-
 public class LinkFinderAction extends RecursiveAction {
 
     private String url;
@@ -30,20 +28,47 @@ public class LinkFinderAction extends RecursiveAction {
      */
     private static final long t0 = System.nanoTime();
 
+    private static boolean reached1500 = false;
+    private static boolean reached3000 = false;
+
     public LinkFinderAction(String url, ILinkHandler cr) {
-        // ToDo: Implement Constructor
+        this.url = url;
+        this.cr = cr;
     }
 
     @Override
     public void compute() {
-        // ToDo:
-        // 1. if crawler has not visited url yet:
-        // 2. Create new list of recursiveActions
-        // 3. Parse url
-        // 4. extract all links from url
-        // 5. add new Action for each sublink
-        // 6. if size of crawler exceeds 500 -> print elapsed time for statistics
-        // -> Do not forget to call ìnvokeAll on the actions!      
+
+        if (cr.size() > 1500 && !reached1500) {
+            reached1500 = true;
+            System.out.println(((System.nanoTime() - t0) / 1000000000) + " s");
+        }
+
+        if (cr.size() > 3000 && !reached3000) {
+            reached3000 = true;
+            System.out.println(((System.nanoTime() - t0) / 1000000000) + " s");
+        }
+
+        if (!cr.visited(url)) {
+            try {
+                Document doc = Jsoup.connect(url).ignoreContentType(true).get();
+                Elements links = doc.select("a[href]");
+                cr.addVisited(url);
+                List<LinkFinderAction> findInInnerLinks = links.stream()
+                        .map(link -> {
+                            if (link.attr("href").startsWith("http")) {
+                                return new LinkFinderAction(link.attr("href"), cr);
+                            }
+                            return null;
+                        })
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+
+                invokeAll(findInInnerLinks);
+
+            } catch (IOException e) {
+                System.out.println("IOException");
+            }
+        }
     }
 }
-
