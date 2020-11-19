@@ -66,12 +66,12 @@ public class LinkFinder implements Runnable {
                                     linkHandler.queueLink(link.attr("href"));
                                 }
                             } catch (Exception e) {
-                                System.out.println("Exception");
+                                System.out.println("getSimpleLinks Exception");
                             }
                         });
 
             } catch (IOException e) {
-                System.out.println("IOException");
+
             }
         }
     }

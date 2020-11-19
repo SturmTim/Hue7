@@ -54,7 +54,8 @@ public class LinkFinderAction extends RecursiveAction {
                 Document doc = Jsoup.connect(url).ignoreContentType(true).get();
                 Elements links = doc.select("a[href]");
                 cr.addVisited(url);
-                List<LinkFinderAction> findInInnerLinks = links.stream()
+
+                List<LinkFinderAction> subfinders = links.stream()
                         .map(link -> {
                             if (link.attr("href").startsWith("http")) {
                                 return new LinkFinderAction(link.attr("href"), cr);
@@ -64,10 +65,10 @@ public class LinkFinderAction extends RecursiveAction {
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList());
 
-                invokeAll(findInInnerLinks);
+                invokeAll(subfinders);
 
             } catch (IOException e) {
-                System.out.println("IOException");
+
             }
         }
     }
