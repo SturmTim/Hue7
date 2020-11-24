@@ -8,6 +8,7 @@ package net.eaustria.webcrawler;
 import java.io.IOException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
@@ -37,12 +38,6 @@ public class LinkFinder implements Runnable {
     }
 
     private void getSimpleLinks(String url) {
-        // ToDo: Implement
-        // 1. if url not already visited, visit url with linkHandler
-        // 2. get url and Parse Website
-        // 3. extract all URLs and add url to list of urls which should be visited
-        //    only if link is not empty and url has not been visited before
-        // 4. If size of link handler equals 500 -> print time elapsed for statistics
         if (linkHandler.size() > 1500 && !reached1500) {
             reached1500 = true;
             System.out.println(((System.nanoTime() - t0) / 1000000000) + " s");
@@ -59,16 +54,15 @@ public class LinkFinder implements Runnable {
                 Elements links = doc.select("a[href]");
                 linkHandler.addVisited(url);
 
-                links.stream()
-                        .forEach(link -> {
-                            try {
-                                if (link.attr("href").startsWith("http")) {
-                                    linkHandler.queueLink(link.attr("href"));
-                                }
-                            } catch (Exception e) {
-                                System.out.println("getSimpleLinks Exception");
-                            }
-                        });
+                for (Element link : links) {
+                    if (link.attr("href").startsWith("http")) {
+                        try {
+                            linkHandler.queueLink(link.attr("href"));
+                        } catch (Exception ex) {
+                            System.out.println("Exception");
+                        }
+                    }
+                }
 
             } catch (IOException e) {
 
