@@ -7,7 +7,6 @@ package net.eaustria.webcrawler;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.RecursiveAction;
 import java.util.stream.Collectors;
 import org.jsoup.Jsoup;
@@ -62,7 +61,7 @@ public class LinkFinderAction extends RecursiveAction {
                             }
                             return null;
                         })
-                        .filter(Objects::nonNull)
+                        .filter((obj) -> obj != null)
                         .collect(Collectors.toList());
 
                 invokeAll(subfinders);
